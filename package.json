@@ -1,0 +1,30 @@
+{
+  "name": "conventional-pull-request",
+  "version": "0.1.0",
+  "description": "Lint pull requests with the conventional commit spec for a clean and conventional commit history",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "ncc build main.js -o dist --source-map --license licenses.txt"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CondeNast/conventional-pull-request.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "Apache 2.0",
+  "bugs": {
+    "url": "https://github.com/CondeNast/conventional-pull-request/issues"
+  },
+  "homepage": "https://github.com/CondeNast/conventional-pull-request#readme",
+  "dependencies": {
+    "@actions/core": "^1.2.7",
+    "@actions/github": "^4.0.0",
+    "@commitlint/config-conventional": "^12.1.1",
+    "@commitlint/lint": "^12.1.1"
+  },
+  "devDependencies": {
+    "@vercel/ncc": "^0.28.5"
+  }
+}

@@ -1,0 +1,5 @@
+name: 'Conventional Pull Request'
+description: 'Lint PR to enforce only conventional commits make it into the main branch'
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
