@@ -1,7 +1,7 @@
 const core = require("@actions/core");
 const github = require("@actions/github");
 
-const lintPr = require("./lint-pr");
+const { lintPr } = require("./lint-pr");
 
 jest.mock("@actions/github");
 jest.mock("@actions/core");
@@ -113,3 +113,5 @@ describe("lintPR", () => {
     // TODO: contextual pull request test
   });
 });
+
+// describe('getLintConfig', () => {});

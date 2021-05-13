@@ -1,9 +1,47 @@
+const path = require("path");
+
 const core = require("@actions/core");
 const github = require("@actions/github");
 const lint = require("@commitlint/lint").default;
-const configConventional = require("@commitlint/config-conventional");
+const configConventional = require('@commitlint/config-conventional');
 
-module.exports = async function lintPR() {
+const CONFIG_PATH = process.env.INPUT_COMMITLINTCONFIGPATH;
+const COMMIT_TITLE_MATCH = typeof process.env.INPUT_COMMITTITLEMATCH === 'string' ? JSON.parse(
+  process.env.INPUT_COMMITTITLEMATCH.trim()
+) : true;
+const GITHUB_WORKSPACE = process.env.GITHUB_WORKSPACE || "";
+
+async function getLintRules() {
+  const workspacePath =
+    CONFIG_PATH && typeof CONFIG_PATH === "string" && GITHUB_WORKSPACE;
+
+  let config = { ...configConventional.rules };
+  console.log(JSON.stringify(config));
+  console.log('------');
+
+  // if $GITHUB_WORKSPACE is not set, the checkout action has not run so we can't import the rules file
+  if (CONFIG_PATH && !GITHUB_WORKSPACE) {
+    core.warn(
+      "ACTION(commitlintConfigPath): actions/checkout@v2 is required to load your commitlint configuration file"
+    );
+  } else if (workspacePath) {
+    const configPath = path.join(workspacePath, CONFIG_PATH);
+    try {
+      /* eslint-disable-next-line global-require, import/no-dynamic-require */
+      const rulesOverride = require(configPath);
+      config = { ...configConventional.rules, ...rulesOverride.rules };
+      console.log(JSON.stringify(config));
+    } catch (e) {
+      if (e.code === 'MODULE_NOT_FOUND') {
+        core.warn(`action(commitlintConfigPath): rules module not found: ${configPath}, using default @commitlint/config-conventional lint rules`);
+      }
+    }
+  }
+
+  return config;
+}
+
+async function lintPR() {
   const client = github.getOctokit(process.env.GITHUB_TOKEN);
 
   if (!github.context.payload.pull_request) {
@@ -28,6 +66,15 @@ module.exports = async function lintPR() {
     pull_number,
   });
 
+  const config = await getLintRules();
+
+  // TODO: remove this
+  core.info(JSON.stringify(config));
+
+  const parserPreset = config.parserPreset
+    ? { parserOpts: config.parserPreset.parserOpts }
+    : {};
+
   if (pullRequest.commits <= 1) {
     const {
       data: [{ commit }],
@@ -38,7 +85,8 @@ module.exports = async function lintPR() {
       per_page: 1,
     });
 
-    const commitReport = await lint(commit.message, configConventional.rules);
+    const commitReport = await lint(commit.message, config.rules, parserPreset);
+
     commitReport.warnings.forEach((warn) =>
       core.warning(`Commit message: ${warn.message}`)
     );
@@ -52,13 +100,17 @@ module.exports = async function lintPR() {
       );
     }
 
-    if (pullRequest.title !== commit.message) {
+    if (COMMIT_TITLE_MATCH && pullRequest.title !== commit.message) {
       core.setFailed(
         "COMMIT: PRs with a single commit require the PR title and commit message to match"
       );
     }
   } else {
-    const titleReport = await lint(pullRequest.title, configConventional.rules);
+    const titleReport = await lint(
+      pullRequest.title,
+      config.rules,
+      parserPreset
+    );
     titleReport.warnings.forEach((warn) =>
       core.warning(`PR title: ${warn.message}`)
     );
@@ -70,4 +122,9 @@ module.exports = async function lintPR() {
       );
     }
   }
+}
+
+module.exports = {
+  lintPR,
+  getLintRules,
 };

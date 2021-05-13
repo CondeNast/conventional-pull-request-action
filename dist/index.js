@@ -1254,6 +1254,105 @@ module.exports = {
 			],
 		],
 	},
+	prompt: {
+		questions: {
+			type: {
+				description: "Select the type of change that you're committing:",
+				enum: {
+					feat: {
+						description: 'A new feature',
+						title: 'Features',
+						emoji: '✨',
+					},
+					fix: {
+						description: 'A bug fix',
+						title: 'Bug Fixes',
+						emoji: '🐛',
+					},
+					docs: {
+						description: 'Documentation only changes',
+						title: 'Documentation',
+						emoji: '📚',
+					},
+					style: {
+						description:
+							'Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)',
+						title: 'Styles',
+						emoji: '💎',
+					},
+					refactor: {
+						description:
+							'A code change that neither fixes a bug nor adds a feature',
+						title: 'Code Refactoring',
+						emoji: '📦',
+					},
+					perf: {
+						description: 'A code change that improves performance',
+						title: 'Performance Improvements',
+						emoji: '🚀',
+					},
+					test: {
+						description: 'Adding missing tests or correcting existing tests',
+						title: 'Tests',
+						emoji: '🚨',
+					},
+					build: {
+						description:
+							'Changes that affect the build system or external dependencies (example scopes: gulp, broccoli, npm)',
+						title: 'Builds',
+						emoji: '🛠',
+					},
+					ci: {
+						description:
+							'Changes to our CI configuration files and scripts (example scopes: Travis, Circle, BrowserStack, SauceLabs)',
+						title: 'Continuous Integrations',
+						emoji: '⚙️',
+					},
+					chore: {
+						description: "Other changes that don't modify src or test files",
+						title: 'Chores',
+						emoji: '♻️',
+					},
+					revert: {
+						description: 'Reverts a previous commit',
+						title: 'Reverts',
+						emoji: '🗑',
+					},
+				},
+			},
+			scope: {
+				description:
+					'What is the scope of this change (e.g. component or file name)',
+			},
+			subject: {
+				description:
+					'Write a short, imperative tense description of the change',
+			},
+			body: {
+				description: 'Provide a longer description of the change',
+			},
+			isBreaking: {
+				description: 'Are there any breaking changes?',
+			},
+			breakingBody: {
+				description:
+					'A BREAKING CHANGE commit requires a body. Please enter a longer description of the commit itself',
+			},
+			breaking: {
+				description: 'Describe the breaking changes',
+			},
+			isIssueAffected: {
+				description: 'Does this change affect any open issues?',
+			},
+			issuesBody: {
+				description:
+					'If issues are closed, the commit requires a body. Please enter a longer description of the commit itself',
+			},
+			issues: {
+				description: 'Add issue references (e.g. "fix #123", "re #123".)',
+			},
+		},
+	},
 };
 
 
@@ -2870,10 +2969,11 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 __exportStar(__nccwpck_require__(1305), exports);
 __exportStar(__nccwpck_require__(2562), exports);
 __exportStar(__nccwpck_require__(3429), exports);
-__exportStar(__nccwpck_require__(9931), exports);
 __exportStar(__nccwpck_require__(1204), exports);
 __exportStar(__nccwpck_require__(8486), exports);
 __exportStar(__nccwpck_require__(2850), exports);
+__exportStar(__nccwpck_require__(6310), exports);
+__exportStar(__nccwpck_require__(9931), exports);
 //# sourceMappingURL=index.js.map
 
 /***/ }),
@@ -2915,6 +3015,16 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 //# sourceMappingURL=parse.js.map
+
+/***/ }),
+
+/***/ 6310:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+//# sourceMappingURL=prompt.js.map
 
 /***/ }),
 
@@ -35855,12 +35965,50 @@ try {
 /***/ 718:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
+const path = __nccwpck_require__(5622);
+
 const core = __nccwpck_require__(2186);
 const github = __nccwpck_require__(5438);
 const lint = __nccwpck_require__(9152).default;
 const configConventional = __nccwpck_require__(5398);
 
-module.exports = async function lintPR() {
+const CONFIG_PATH = process.env.INPUT_COMMITLINTCONFIGPATH;
+const COMMIT_TITLE_MATCH = typeof process.env.INPUT_COMMITTITLEMATCH === 'string' ? JSON.parse(
+  process.env.INPUT_COMMITTITLEMATCH.trim()
+) : true;
+const GITHUB_WORKSPACE = process.env.GITHUB_WORKSPACE || "";
+
+async function getLintRules() {
+  const workspacePath =
+    CONFIG_PATH && typeof CONFIG_PATH === "string" && GITHUB_WORKSPACE;
+
+  let config = { ...configConventional.rules };
+  console.log(JSON.stringify(config));
+  console.log('------');
+
+  // if $GITHUB_WORKSPACE is not set, the checkout action has not run so we can't import the rules file
+  if (CONFIG_PATH && !GITHUB_WORKSPACE) {
+    core.warn(
+      "ACTION(commitlintConfigPath): actions/checkout@v2 is required to load your commitlint configuration file"
+    );
+  } else if (workspacePath) {
+    const configPath = path.join(workspacePath, CONFIG_PATH);
+    try {
+      /* eslint-disable-next-line global-require, import/no-dynamic-require */
+      const rulesOverride = require(configPath);
+      config = { ...configConventional.rules, ...rulesOverride.rules };
+      console.log(JSON.stringify(config));
+    } catch (e) {
+      if (e.code === 'MODULE_NOT_FOUND') {
+        core.warn(`action(commitlintConfigPath): rules module not found: ${configPath}, using default @commitlint/config-conventional lint rules`);
+      }
+    }
+  }
+
+  return config;
+}
+
+async function lintPR() {
   const client = github.getOctokit(process.env.GITHUB_TOKEN);
 
   if (!github.context.payload.pull_request) {
@@ -35885,6 +36033,15 @@ module.exports = async function lintPR() {
     pull_number,
   });
 
+  const config = await getLintRules();
+
+  // TODO: remove this
+  core.info(JSON.stringify(config));
+
+  const parserPreset = config.parserPreset
+    ? { parserOpts: config.parserPreset.parserOpts }
+    : {};
+
   if (pullRequest.commits <= 1) {
     const {
       data: [{ commit }],
@@ -35895,7 +36052,8 @@ module.exports = async function lintPR() {
       per_page: 1,
     });
 
-    const commitReport = await lint(commit.message, configConventional.rules);
+    const commitReport = await lint(commit.message, config.rules, parserPreset);
+
     commitReport.warnings.forEach((warn) =>
       core.warning(`Commit message: ${warn.message}`)
     );
@@ -35909,13 +36067,17 @@ module.exports = async function lintPR() {
       );
     }
 
-    if (pullRequest.title !== commit.message) {
+    if (COMMIT_TITLE_MATCH && pullRequest.title !== commit.message) {
       core.setFailed(
         "COMMIT: PRs with a single commit require the PR title and commit message to match"
       );
     }
   } else {
-    const titleReport = await lint(pullRequest.title, configConventional.rules);
+    const titleReport = await lint(
+      pullRequest.title,
+      config.rules,
+      parserPreset
+    );
     titleReport.warnings.forEach((warn) =>
       core.warning(`PR title: ${warn.message}`)
     );
@@ -35927,6 +36089,11 @@ module.exports = async function lintPR() {
       );
     }
   }
+}
+
+module.exports = {
+  lintPR,
+  getLintRules,
 };
 
 
@@ -36104,7 +36271,7 @@ var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
 const core = __nccwpck_require__(2186);
-const lintPR = __nccwpck_require__(718);
+const { lintPR } = __nccwpck_require__(718);
 
 lintPR().catch((err) => {
   core.setFailed(err.message);

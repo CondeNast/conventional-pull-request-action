@@ -3,3 +3,11 @@ description: 'Lint PR to enforce only conventional commits make it into the main
 runs:
   using: 'node12'
   main: 'dist/index.js'
+inputs:
+  commitlintConfigPath:
+    description: "Relative path to a commitlint configuration file"
+    required: false
+  commitTitleMatch:
+    description: "PRs with a single commit require the PR title and commit message to match"
+    required: false
+    default: 'true'
