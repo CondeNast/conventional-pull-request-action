@@ -1,7 +1,7 @@
 const core = require("@actions/core");
 const github = require("@actions/github");
 
-const { lintPr } = require("./lint-pr");
+const { lintPR } = require("./lint-pr");
 
 jest.mock("@actions/github");
 jest.mock("@actions/core");
@@ -49,12 +49,12 @@ describe("lintPR", () => {
 
   describe("when pull request has one commit", () => {
     it("does not fail when commit message is to spec and pr title matches commit message", async () => {
-      await lintPr();
+      await lintPR();
       expect(core.setFailed).not.toHaveBeenCalled();
     });
 
     it("fetches pr commit", async () => {
-      await lintPr();
+      await lintPR();
       expect(githubClient.pulls.listCommits).toHaveBeenCalledTimes(1);
     });
 
@@ -63,7 +63,7 @@ describe("lintPR", () => {
         data: [{ commit: { ...commitFixture, message: "not conventional" } }],
       });
 
-      await lintPr();
+      await lintPR();
       expect(core.setFailed).toHaveBeenCalled();
     });
 
@@ -72,7 +72,7 @@ describe("lintPR", () => {
         data: { ...prFixture, title: "feat: does not match commit" },
       });
 
-      await lintPr();
+      await lintPR();
       expect(core.setFailed).toHaveBeenCalled();
     });
   });
@@ -83,7 +83,7 @@ describe("lintPR", () => {
         data: { ...prFixture, commits: 2 },
       });
 
-      await lintPr();
+      await lintPR();
       expect(core.setFailed).not.toHaveBeenCalled();
     });
 
@@ -95,7 +95,7 @@ describe("lintPR", () => {
         data: { ...prFixture, commits: 2 },
       });
 
-      await lintPr();
+      await lintPR();
       expect(core.setFailed).not.toHaveBeenCalled();
     });
 
@@ -104,7 +104,7 @@ describe("lintPR", () => {
         data: { ...prFixture, commits: 2, title: "not conventional" },
       });
 
-      await lintPr();
+      await lintPR();
       expect(core.setFailed).toHaveBeenCalled();
     });
   });
