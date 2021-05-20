@@ -10,7 +10,7 @@ module.exports = () => {
 
   return {
     COMMIT_TITLE_MATCH,
-    CONFIG_PATH: process.env.INPUT_COMMITLINTCONFIGPATH,
+    RULES_PATH: process.env.INPUT_COMMITLINTRULESPATH,
     GITHUB_TOKEN: process.env.GITHUB_TOKEN,
     GITHUB_WORKSPACE: process.env.GITHUB_WORKSPACE,
   };
