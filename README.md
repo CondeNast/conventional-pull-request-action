@@ -14,11 +14,6 @@ This action uses [commitlint](https://github.com/conventional-changelog/commitli
 This action lints the pull request's title, and in the case of a PR with a single commit, the commit message (see [FAQ](#faq) for details).
 
 ## Configuration
-
-### Rule Overrides
-
-This action supports overriding rules from [config-conventional][1](see this repo as an example):
-
 ```yml
 # .github/workflows/main.yml
 
@@ -36,8 +31,13 @@ jobs:
 
         ...
 ```
+
+### Rule Overrides
+
+This action supports overriding rules from [config-conventional][1] (see this repo as an example):
+
 ```js
-./commitlint.rules.js
+// ./commitlint.rules.js
 
 module.exports = {
   rules: {
@@ -46,11 +46,12 @@ module.exports = {
 }
 ```
 
-> Your rules file must export an object with a `rules` field, other `commitlint` config is not supported.
+> Your rules file must export an object with a `rules` field, other `commitlint` configuration fields are not supported.
+
 > If you use `commitlint` in your git hooks, you can extend your custom rules in your [`commitlint.config.js`](commitlint.config.js) so the `commitlint` rules config is shared between your hook and this action, ex: [`commitlint.config.js`](commitlint.config.js)
 
 ```js
-# ./commitlint.config.js
+// ./commitlint.config.js
 
 module.exports = {
   extends: ["@commitlint/config-conventional", "./commitlint.rules.js"],
