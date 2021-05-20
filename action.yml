@@ -4,8 +4,8 @@ runs:
   using: 'node12'
   main: 'dist/index.js'
 inputs:
-  commitlintConfigPath:
-    description: "Relative path to a commitlint configuration file"
+  commitlintRulesPath:
+    description: "Relative path to commitlint rules file"
     required: false
   commitTitleMatch:
     description: "PRs with a single commit require the PR title and commit message to match"

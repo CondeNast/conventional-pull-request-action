@@ -35962,59 +35962,78 @@ try {
 
 /***/ }),
 
+/***/ 8094:
+/***/ ((module) => {
+
+module.exports = () => {
+  let COMMIT_TITLE_MATCH = true;
+  try {
+    const ctmVal = JSON.parse(process.env.INPUT_COMMITTITLEMATCH.trim());
+    COMMIT_TITLE_MATCH =
+      ctmVal === true || ctmVal === false ? ctmVal : COMMIT_TITLE_MATCH;
+  } catch (_) {
+    // ignore json parse error
+  }
+
+  return {
+    COMMIT_TITLE_MATCH,
+    CONFIG_PATH: process.env.INPUT_COMMITLINTCONFIGPATH,
+    GITHUB_TOKEN: process.env.GITHUB_TOKEN,
+    GITHUB_WORKSPACE: process.env.GITHUB_WORKSPACE,
+  };
+};
+
+
+/***/ }),
+
+/***/ 3150:
+/***/ ((module) => {
+
+module.exports = {
+  fail: {
+    commit: {
+      commit_title_match:
+        "COMMIT: PRs with a single commit require the PR title and commit message to match",
+      lint: "COMMIT: PRs with a single commit require the commit message to conform to the conventional commit spec",
+    },
+    pull_request: {
+      lint: "PULL REQUEST: PR title does not conform to the conventional commit spec",
+      not_found:
+        "Pull request not found. Use pull request event to trigger this action",
+    },
+  },
+  warning: {
+    action: {
+      checkout:
+        "ACTION(commitlintRulesPath): actions/checkout@v2 is required to load your commitlint rules file",
+      rules_not_found:
+        "ACTION(commitlintRules ): rules module not found, using default @commitlint/config-conventional lint rules...",
+    },
+  },
+};
+
+
+/***/ }),
+
 /***/ 718:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-const path = __nccwpck_require__(5622);
 
 const core = __nccwpck_require__(2186);
 const github = __nccwpck_require__(5438);
 const lint = __nccwpck_require__(9152).default;
-const configConventional = __nccwpck_require__(5398);
 
-const CONFIG_PATH = process.env.INPUT_COMMITLINTCONFIGPATH;
-const COMMIT_TITLE_MATCH =
-  typeof process.env.INPUT_COMMITTITLEMATCH === "string"
-    ? JSON.parse(process.env.INPUT_COMMITTITLEMATCH.trim())
-    : true;
-const GITHUB_WORKSPACE = process.env.GITHUB_WORKSPACE || "";
-
-async function getLintRules() {
-  const workspacePath =
-    CONFIG_PATH && typeof CONFIG_PATH === "string" && GITHUB_WORKSPACE;
-
-  let config = { ...configConventional.rules };
-
-  // if $GITHUB_WORKSPACE is not set, the checkout action has not run so we can't import the rules file
-  if (CONFIG_PATH && !GITHUB_WORKSPACE) {
-    core.warn(
-      "ACTION(commitlintConfigPath): actions/checkout@v2 is required to load your commitlint configuration file"
-    );
-  } else if (workspacePath) {
-    const configPath = path.join(workspacePath, CONFIG_PATH);
-    try {
-      /* eslint-disable-next-line global-require, import/no-dynamic-require */
-      const rulesOverride = require(configPath);
-      config = { ...configConventional.rules, ...rulesOverride.rules };
-    } catch (e) {
-      if (e.code === "MODULE_NOT_FOUND") {
-        core.warn(
-          `action(commitlintConfigPath): rules module not found: ${configPath}, using default @commitlint/config-conventional lint rules`
-        );
-      }
-    }
-  }
-
-  return config;
-}
+const getActionConfig = __nccwpck_require__(8094);
+const actionMessage = __nccwpck_require__(3150);
+const getLintRules = __nccwpck_require__(2608);
 
 async function lintPR() {
-  const client = github.getOctokit(process.env.GITHUB_TOKEN);
+  const actionConfig = getActionConfig();
+  const { GITHUB_TOKEN, COMMIT_TITLE_MATCH } = actionConfig;
+
+  const client = github.getOctokit(GITHUB_TOKEN);
 
   if (!github.context.payload.pull_request) {
-    core.setFailed(
-      "Pull request not found. Use pull request event to trigger this action"
-    );
+    core.setFailed(actionMessage.fail.pull_request.not_found);
     return;
   }
 
@@ -36033,14 +36052,7 @@ async function lintPR() {
     pull_number,
   });
 
-  const config = await getLintRules();
-
-  // TODO: remove this
-  core.info(JSON.stringify(config));
-
-  const parserPreset = config.parserPreset
-    ? { parserOpts: config.parserPreset.parserOpts }
-    : {};
+  const lintRules = await getLintRules(actionConfig);
 
   if (pullRequest.commits <= 1) {
     const {
@@ -36052,7 +36064,7 @@ async function lintPR() {
       per_page: 1,
     });
 
-    const commitReport = await lint(commit.message, config.rules, parserPreset);
+    const commitReport = await lint(commit.message, lintRules);
 
     commitReport.warnings.forEach((warn) =>
       core.warning(`Commit message: ${warn.message}`)
@@ -36062,38 +36074,66 @@ async function lintPR() {
     );
 
     if (!commitReport.valid) {
-      core.setFailed(
-        "COMMIT: PRs with a single commit require the commit message to conform to the conventional commit spec"
-      );
+      core.setFailed(actionMessage.fail.commit.lint);
     }
 
     if (COMMIT_TITLE_MATCH && pullRequest.title !== commit.message) {
-      core.setFailed(
-        "COMMIT: PRs with a single commit require the PR title and commit message to match"
-      );
+      core.setFailed(actionMessage.fail.commit.commit_title_match);
     }
   } else {
-    const titleReport = await lint(
-      pullRequest.title,
-      config.rules,
-      parserPreset
-    );
+    const titleReport = await lint(pullRequest.title, lintRules);
     titleReport.warnings.forEach((warn) =>
       core.warning(`PR title: ${warn.message}`)
     );
     titleReport.errors.forEach((err) => core.error(`PR title: ${err.message}`));
 
     if (!titleReport.valid) {
-      core.setFailed(
-        "PULL REQUEST: PR title does not conform to the conventional commit spec"
-      );
+      core.setFailed(actionMessage.fail.pull_request.lint);
     }
   }
 }
 
 module.exports = {
   lintPR,
-  getLintRules,
+};
+
+
+/***/ }),
+
+/***/ 2608:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+const path = __nccwpck_require__(5622);
+
+const configConventional = __nccwpck_require__(5398);
+const core = __nccwpck_require__(2186);
+
+const actionMessage = __nccwpck_require__(3150);
+
+module.exports = async function getLintRules(actionConfig) {
+  const { RULES_PATH, GITHUB_WORKSPACE } = actionConfig;
+
+  let rules = { ...configConventional.rules };
+
+  // if $GITHUB_WORKSPACE is not set, the checkout action has not run so we can't import the rules file
+  if (RULES_PATH && !GITHUB_WORKSPACE) {
+    core.warning(actionMessage.warning.action.checkout);
+  } else if (RULES_PATH && GITHUB_WORKSPACE) {
+    const configPath = path.resolve(GITHUB_WORKSPACE, RULES_PATH);
+    try {
+      /* eslint-disable-next-line global-require, import/no-dynamic-require */
+      const rulesOverride = require(configPath);
+      rules = { ...configConventional.rules, ...rulesOverride.rules };
+    } catch (e) {
+      if (e.code === "MODULE_NOT_FOUND") {
+        core.warning(actionMessage.warning.action.rules_not_found);
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  return rules;
 };
 
 

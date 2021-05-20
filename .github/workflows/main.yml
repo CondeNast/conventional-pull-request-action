@@ -30,4 +30,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          commitlintConfigPath: './commitlint.rules.js'
+          commitlintRulesPath: './commitlint.rules.js'

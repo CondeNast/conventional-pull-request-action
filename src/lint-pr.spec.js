@@ -1,10 +1,14 @@
 const core = require("@actions/core");
 const github = require("@actions/github");
 
-const { lintPR } = require("./lint-pr");
+const { lintPR } = require("./lint-pr.js");
+const getActionConfig = require("./action-config.js");
+const actionMessage = require("./action-message.js");
+const actionConfigFixture = require("./fixtures/action-config.js");
 
 jest.mock("@actions/github");
 jest.mock("@actions/core");
+jest.mock("./action-config.js");
 
 const commitFixture = {
   message: "feat: some commit message",
@@ -31,6 +35,8 @@ github.context = {
   },
 };
 
+getActionConfig.mockImplementation(() => actionConfigFixture);
+
 const githubClient = {
   pulls: {
     get: jest.fn().mockReturnValue({ data: prFixture }),
@@ -48,6 +54,34 @@ describe("lintPR", () => {
   });
 
   describe("when pull request has one commit", () => {
+    describe("when COMMIT_TITLE_MATCH is true", () => {
+      it("fails when pr title does not match the commit message", async () => {
+        githubClient.pulls.get.mockReturnValueOnce({
+          data: { ...prFixture, title: "feat: does not match commit" },
+        });
+
+        await lintPR();
+        expect(core.setFailed).toHaveBeenCalledWith(
+          actionMessage.fail.commit.commit_title_match
+        );
+      });
+    });
+
+    describe("when COMMIT_TITLE_MATCH is false", () => {
+      it("passes when pr title does not match the commit message", async () => {
+        getActionConfig.mockReturnValueOnce({
+          ...actionConfigFixture,
+          COMMIT_TITLE_MATCH: false,
+        });
+        githubClient.pulls.get.mockReturnValueOnce({
+          data: { ...prFixture, title: "feat: does not match commit" },
+        });
+
+        await lintPR();
+        expect(core.setFailed).not.toHaveBeenCalled();
+      });
+    });
+
     it("does not fail when commit message is to spec and pr title matches commit message", async () => {
       await lintPR();
       expect(core.setFailed).not.toHaveBeenCalled();
@@ -64,16 +98,9 @@ describe("lintPR", () => {
       });
 
       await lintPR();
-      expect(core.setFailed).toHaveBeenCalled();
-    });
-
-    it("fails when pr title does not match the commit message", async () => {
-      githubClient.pulls.get.mockReturnValueOnce({
-        data: { ...prFixture, title: "feat: does not match commit" },
-      });
-
-      await lintPR();
-      expect(core.setFailed).toHaveBeenCalled();
+      expect(core.setFailed).toHaveBeenCalledWith(
+        actionMessage.fail.commit.lint
+      );
     });
   });
 
@@ -99,13 +126,15 @@ describe("lintPR", () => {
       expect(core.setFailed).not.toHaveBeenCalled();
     });
 
-    it("fails when the PR title is not  conventional", async () => {
+    it("fails when the PR title is not conventional", async () => {
       githubClient.pulls.get.mockReturnValueOnce({
         data: { ...prFixture, commits: 2, title: "not conventional" },
       });
 
       await lintPR();
-      expect(core.setFailed).toHaveBeenCalled();
+      expect(core.setFailed).toHaveBeenCalledWith(
+        actionMessage.fail.pull_request.lint
+      );
     });
   });
 
@@ -113,5 +142,3 @@ describe("lintPR", () => {
     // TODO: contextual pull request test
   });
 });
-
-// describe('getLintConfig', () => {});
