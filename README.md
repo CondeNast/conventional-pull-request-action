@@ -20,7 +20,7 @@ This action lints the pull request's title, and in the case of a PR with a singl
 ### Dev
 Github javascript actions require all dependencies to be checked into the codebase, so we use [ncc](https://github.com/vercel/ncc) to compile all dependencies and source code into a single file. To make changes to this action, change `main.js` and compile it:
 ```sh
-npm run build
+npm run prepare
 ```
 
 > Be sure to commit and push all changed files in `./dist` to see your changes to the action execute.
