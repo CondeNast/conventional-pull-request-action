@@ -7,11 +7,56 @@ _Proudly built by:_
 
 <a href="https://technology.condenast.com"><img src="https://user-images.githubusercontent.com/1215971/35070721-3f136cdc-fbac-11e7-81b4-e3aa5cc70a17.png" title="Conde Nast Technology" width=350/></a>
 
-## Usage
+## Configuration
 
-This action uses [commitlint](https://github.com/conventional-changelog/commitlint#readme) with the [config-conventional configuration](https://github.com/conventional-changelog/commitlint/tree/master/@commitlint/config-conventional) to ensure merge commits meet the conventional commit [spec][0].
+This action uses [commitlint](https://github.com/conventional-changelog/commitlint#readme) with the [config-conventional configuration][1] to ensure merge commits meet the conventional commit [spec][0].
 
 This action lints the pull request's title, and in the case of a PR with a single commit, the commit message (see [FAQ](#faq) for details).
+
+## Configuration
+
+### Rule Overrides
+
+This action supports overriding rules from [config-conventional][1](see this repo as an example):
+
+```yml
+# .github/workflows/main.yml
+
+...
+jobs:
+  lint-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          # override config-conventional rules, specify a relative path to your rules module, actions/checkout is required for this setting!
+          commitlintRulesPath: './commitlint.rules.js' # default: undefined
+          # if the PR contains a single commit, fail if the commit message and the PR title do not match
+          commitTitleMatch: 'true' # default: 'true'
+
+        ...
+```
+```js
+./commitlint.rules.js
+
+module.exports = {
+  rules: {
+    ...
+  }
+}
+```
+
+> Your rules file must export an object with a `rules` field, other `commitlint` config is not supported.
+> If you use `commitlint` in your git hooks, you can extend your custom rules in your [`commitlint.config.js`](commitlint.config.js) so the `commitlint` rules config is shared between your hook and this action, ex: [`commitlint.config.js`](commitlint.config.js)
+
+```js
+# ./commitlint.config.js
+
+module.exports = {
+  extends: ["@commitlint/config-conventional", "./commitlint.rules.js"],
+};
+```
+
 
 
 ## Contributing
@@ -41,4 +86,4 @@ In the case of pull requests with a single commit, the commit message will be us
 See the list of [contributors](https://github.com/CondeNast/conventional-pull-request/contributors) who participated in writing this tool.
 
 [0]: https://www.conventionalcommits.org/en/v1.0.0/#specification
-
+[1]: https://github.com/conventional-changelog/commitlint/tree/master/@commitlint/config-conventional
