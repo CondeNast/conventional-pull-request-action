@@ -28,6 +28,7 @@
   },
   "devDependencies": {
     "@vercel/ncc": "^0.28.5",
+    "commitlint": "^12.1.4",
     "eslint": "^7.25.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-config-prettier": "^8.3.0",
