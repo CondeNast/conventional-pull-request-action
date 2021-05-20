@@ -2,13 +2,15 @@ name: Node.js CI
 
 on:
   pull_request:
+    types:
+      - opened
+      - edited
+      - synchronize
     branches: [ main ]
 
 jobs:
   test:
-
     runs-on: ubuntu-latest
-
     strategy:
       matrix:
         node-version: [ 12.x ]
