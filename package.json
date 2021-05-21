@@ -3,9 +3,6 @@
   "version": "0.0.1",
   "description": "Lint pull requests with the conventional commit spec for a clean and conventional commit history",
   "main": "main.js",
-  "engines": {
-    "node": "12"
-  },
   "scripts": {
     "test": "jest ./src",
     "tdd": "npm run test -- --watch",
