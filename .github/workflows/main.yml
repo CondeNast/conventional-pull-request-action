@@ -7,9 +7,19 @@ on:
       - opened
       - edited
       - synchronize
-    branches: [ main ]
+    branches:
+    - main
+    - master
 
 jobs:
+  opensource-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+      - run: npm ci
+      - run: npm run check
   test:
     runs-on: ubuntu-latest
     strategy:
