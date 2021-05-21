@@ -1,36 +1,12 @@
-<!--- Provide a general summary of your changes in the Title above -->
+<!-- Please provide context around the work within this PR. -->
 
-## Description
-<!--- Describe your changes in detail -->
 
-## Types of changes
-<!--- What types of changes does your code introduce? Put an `x` in all the boxes that apply: -->
-- [ ] Bug fix (non-breaking change which fixes an issue)
-- [ ] New feature (non-breaking change which adds functionality)
-- [ ] Breaking change (fix or feature that would cause existing functionality to change)
 
-## Related Issue
-<!--- This project only accepts pull requests related to open issues -->
-<!--- If suggesting a new feature or change, please discuss it in an issue first -->
-<!--- If fixing a bug, there should be an issue describing it with steps to reproduce -->
-<!--- Please link to the issue here: -->
+## Review Checklist
 
-## Motivation and Context
-<!--- Why is this change required? What problem does it solve? -->
+PR titles must follow the `type: description` format. See [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/#summary) for a summary and examples.
 
-## How Has This Been Tested?
-<!--- Please describe in detail how you tested your changes. -->
-<!--- Include details of your testing environment, and the tests you ran to -->
-<!--- see how your change affects other areas of the code, etc. -->
-<!--- Unit tests are expected for all changes. -->
+Please complete these steps before requesting code review:
 
-## Screenshots (if appropriate):
-
-## Checklist:
-<!--- Go over all the following points, and put an `x` in all the boxes that apply. -->
-<!--- If you're unsure about any of these, don't hesitate to ask. We're here to help! -->
-- [ ] My code follows the code style of this project.
-- [ ] I have updated the documentation (if required).
-- [ ] I have read the **CONTRIBUTING** document.
-- [ ] I have added tests to cover my changes.
-- [ ] All new and existing tests passed.
+-   [ ] This PR provides a description, testing steps, and adequate context for reviewers
+-   [ ] Unit tests added/updated to provide coverage for functional code changes in this PR
