@@ -1,8 +1,8 @@
-name: 'Conventional Pull Request'
-description: 'Lint PR to enforce only conventional commits make it into the main branch'
+name: "Conventional Pull Request"
+description: "Lint PR to enforce only conventional commits make it into the main branch"
 runs:
-  using: 'node12'
-  main: 'dist/index.js'
+  using: "node12"
+  main: "dist/index.js"
 inputs:
   commitlintRulesPath:
     description: "Relative path to commitlint rules file"
@@ -10,4 +10,4 @@ inputs:
   commitTitleMatch:
     description: "PRs with a single commit require the PR title and commit message to match"
     required: false
-    default: 'true'
+    default: "true"
