@@ -19,4 +19,5 @@ Open a [new issue](https://github.com/condenast/conventional-pull-request/issues
 Open a new pull request. Follow the provided template as a guideline.
 
 ### Attribution
+
 These Contributing Guidelines are adapted from the [Atom](https://github.com/atom/atom) Contributing Guidelines, available at https://github.com/atom/atom/blob/master/CONTRIBUTING.md and the [Rails](https://github.com/rails/rails/blob/master/CONTRIBUTING.md) Contributing Guidelines available at https://github.com/rails/rails/blob/master/CONTRIBUTING.md.
