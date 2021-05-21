@@ -25,7 +25,7 @@ jobs:
     - run: npm ci
     - run: npm test
 
-  lint-pr:
+  conventional-pr:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -34,3 +34,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           commitlintRulesPath: './commitlint.rules.js'
+          commitTitleMatch: 'true' # default: 'true'
