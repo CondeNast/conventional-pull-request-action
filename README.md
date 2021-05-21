@@ -1,4 +1,4 @@
-# conventional-pull-request
+# conventional-pull-request-action
 [![license](https://img.shields.io/badge/license-Apache%202.0-blue.svg?style=flat)](LICENSE)
 
 A github action that enforces the [conventional commit spec][0] on pull requests to ensure a clean and conventional commit history.

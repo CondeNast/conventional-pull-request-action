@@ -1,11 +1,15 @@
 {
-  "name": "conventional-pull-request",
+  "name": "conventional-pull-request-action",
   "version": "0.1.0",
   "description": "Lint pull requests with the conventional commit spec for a clean and conventional commit history",
   "main": "main.js",
+  "engines": {
+    "node": "12"
+  },
   "scripts": {
     "test": "jest ./src",
     "tdd": "npm run test -- --watch",
+    "check": "opensource-check --path ./",
     "prepare": "ncc build main.js -o dist --source-map --license licenses.txt"
   },
   "repository": {
@@ -13,8 +17,8 @@
     "url": "git+https://github.com/CondeNast/conventional-pull-request.git"
   },
   "keywords": [],
-  "author": "",
-  "license": "Apache 2.0",
+  "author": "Matt Bedell <matt@bedell.co> (https://bedell.co/)",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/CondeNast/conventional-pull-request/issues"
   },
@@ -38,6 +42,9 @@
     "jest": "^26.6.3",
     "lint-staged": "^11.0.0",
     "prettier": "^2.3.0"
+  },
+  "optionalDependencies": {
+    "@condenast/opensource-check": "0.0.4"
   },
   "lint-staged": {
     "*.js": [
