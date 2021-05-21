@@ -19,11 +19,20 @@ This action lints the pull request's title, and in the case of a PR with a singl
 Create a [github action](https://docs.github.com/en/actions/quickstart) workflow:
 
 ```yml
-# .github/workflows/main.yml
+# .github/workflows/conventional-pr.yml
 
-...
+name: conventional-pr
+on:
+  pull_request:
+    branches:
+      - main
+      - master
+    types:
+      - opened
+      - edited
+      - synchronize
 jobs:
-  conventional-pr:
+  lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -31,11 +40,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           # to override config-conventional rules, specify a relative path to your rules module, actions/checkout is required for this setting!
-          commitlintRulesPath: './commitlint.rules.js' # default: undefined
+          commitlintRulesPath: "./commitlint.rules.js" # default: undefined
           # if the PR contains a single commit, fail if the commit message and the PR title do not match
-          commitTitleMatch: 'true' # default: 'true'
-
-        ...
+          commitTitleMatch: "true" # default: 'true'
 ```
 
 ### Rule Overrides
@@ -69,6 +76,13 @@ module.exports = {
 [How to contribute](CONTRIBUTING.md)
 
 ### Dev
+
+#### Install
+
+```sh
+nvm use
+npm i
+```
 
 Github javascript actions require all dependencies to be checked into the codebase, so we use [ncc](https://github.com/vercel/ncc) to compile all dependencies and source code into a single file. To make changes to this action, compile and commit:
 
