@@ -8,6 +8,17 @@ _Proudly built by:_
 
 <a href="https://technology.condenast.com"><img src="https://user-images.githubusercontent.com/1215971/35070721-3f136cdc-fbac-11e7-81b4-e3aa5cc70a17.png" title="Conde Nast Technology" width=350/></a>
 
+- [Usage](#usage)
+
+  - [Configuration](#configuration)
+  - [Rule Overrides](#rule-overrides)
+
+- [Contributing](#contributing)
+  - [Develop](#dev)
+    - [Install](#install)
+  - [Releasing](#release)
+- [FAQ](#faq)
+
 ## Usage
 
 This action uses [commitlint](https://github.com/conventional-changelog/commitlint#readme) with the [config-conventional configuration][1] to ensure merge commits meet the conventional commit [spec][0].
@@ -96,6 +107,15 @@ git commit
 ```
 
 > Be sure to commit and push all changed files in `./dist` to see your changes to the action execute.
+
+### Release
+
+From the up-to-date `main` branch:
+
+```sh
+npm run release
+git push --follow-tags
+```
 
 ## FAQ
 
