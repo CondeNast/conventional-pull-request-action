@@ -32,10 +32,13 @@ on:
       - edited
       - synchronize
 jobs:
-  lint:
+  lint-pr:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      # check for the most recent release: https://github.com/CondeNast/conventional-pull-request-action/releases
+      # replace vX.X.X below with the most recently released version
+      - uses: CondeNast/conventional-pull-request-action@vX.X.X
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
