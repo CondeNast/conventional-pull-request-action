@@ -43,7 +43,7 @@
     "standard-version": "^9.3.0"
   },
   "optionalDependencies": {
-    "@condenast/opensource-check": "0.0.4"
+    "@condenast/opensource-check": "0.0.5"
   },
   "lint-staged": {
     "*.js": [
