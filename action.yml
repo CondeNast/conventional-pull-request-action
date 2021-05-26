@@ -1,5 +1,9 @@
 name: "Conventional Pull Request"
-description: "Lint PR to enforce only conventional commits make it into the main branch"
+description: "Lint pull requests with the conventional commit spec, for a clean and conventional commit history"
+author: "Matt Bedell <matt@bedell.co>"
+branding:
+  icon: "git-pull-request"
+  color: "green"
 runs:
   using: "node12"
   main: "dist/index.js"
