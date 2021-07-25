@@ -8,7 +8,7 @@ const actionMessage = require("./action-message.js");
 module.exports = async function getLintRules(actionConfig) {
   const { RULES_PATH, GITHUB_WORKSPACE } = actionConfig;
 
-  let rules = { ...configConventional.rules };
+  let overrideRules = {};
 
   // if $GITHUB_WORKSPACE is not set, the checkout action has not run so we can't import the rules file
   if (RULES_PATH && !GITHUB_WORKSPACE) {
@@ -17,8 +17,8 @@ module.exports = async function getLintRules(actionConfig) {
     const configPath = path.resolve(GITHUB_WORKSPACE, RULES_PATH);
     try {
       /* eslint-disable-next-line global-require, import/no-dynamic-require */
-      const rulesOverride = require(configPath);
-      rules = { ...configConventional.rules, ...rulesOverride.rules };
+      const localRules = require(configPath);
+      overrideRules = localRules.rules;
     } catch (e) {
       if (e.code === "MODULE_NOT_FOUND") {
         core.warning(actionMessage.warning.action.rules_not_found);
@@ -27,6 +27,5 @@ module.exports = async function getLintRules(actionConfig) {
       }
     }
   }
-
-  return rules;
+  return { ...configConventional.rules, ...overrideRules };
 };
