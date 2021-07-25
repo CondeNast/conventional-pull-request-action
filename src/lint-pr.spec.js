@@ -53,6 +53,24 @@ describe("lintPR", () => {
     jest.clearAllMocks();
   });
 
+  it("lints with config-conventional parser options", async () => {
+    const commitMeetsSpec = "feat!: exclamation mark will pass";
+    githubClient.pulls.listCommits.mockReturnValueOnce({
+      data: [{ commit: { ...commitFixture, message: commitMeetsSpec } }],
+    });
+
+    githubClient.pulls.get.mockReturnValueOnce({
+      data: { ...prFixture, commits: 1, title: commitMeetsSpec },
+    });
+
+    await lintPR();
+    expect(core.setFailed).not.toHaveBeenCalled();
+  });
+
+  it("fails when contextual pull request is not found", async () => {
+    // TODO: contextual pull request test
+  });
+
   describe("when pull request has one commit", () => {
     describe("when COMMIT_TITLE_MATCH is true", () => {
       it("fails when pr title does not match the commit message", async () => {
@@ -136,9 +154,5 @@ describe("lintPR", () => {
         actionMessage.fail.pull_request.lint
       );
     });
-  });
-
-  it("fails when contextual pull request is not found", async () => {
-    // TODO: contextual pull request test
   });
 });
