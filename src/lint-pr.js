@@ -3,7 +3,7 @@ const github = require("@actions/github");
 const lint = require("@commitlint/lint").default;
 const parserPreset = require("conventional-changelog-conventionalcommits");
 
-const getActionConfig = require("./action-config.js");
+const { getActionConfig, getCommitSubject } = require("./utils.js");
 const actionMessage = require("./action-message.js");
 const getLintRules = require("./lint-rules.js");
 
@@ -48,6 +48,8 @@ async function lintPR() {
       per_page: 1,
     });
 
+    const commitMessageSubject = getCommitSubject(commit.message);
+
     const commitReport = await lint(commit.message, lintRules, { parserOpts });
 
     commitReport.warnings.forEach((warn) =>
@@ -61,7 +63,7 @@ async function lintPR() {
       core.setFailed(actionMessage.fail.commit.lint);
     }
 
-    if (COMMIT_TITLE_MATCH && pullRequest.title !== commit.message) {
+    if (COMMIT_TITLE_MATCH && pullRequest.title !== commitMessageSubject) {
       core.setFailed(actionMessage.fail.commit.commit_title_match);
     }
   } else {
