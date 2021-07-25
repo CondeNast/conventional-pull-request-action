@@ -1,6 +1,6 @@
-const getActionConfig = require("./action-config.js");
+const { getActionConfig, getCommitSubject } = require("./utils.js");
 
-describe("lint-rules", () => {
+describe("getActionConfig", () => {
   beforeEach(() => {
     process.env.INPUT_COMMITTITLEMATCH = "true";
     process.env.INPUT_COMMITLINTRULESPATH = "./commitlint.rules.js";
@@ -34,6 +34,28 @@ describe("lint-rules", () => {
       RULES_PATH: expect.any(String),
       GITHUB_TOKEN: expect.any(String),
       GITHUB_WORKSPACE: expect.any(String),
+    });
+  });
+});
+
+describe("getCommitSubject", () => {
+  const commitWithSubjectOnly = "feat(test): some commit message subject";
+  const commitWithBody = `${commitWithSubjectOnly}
+
+this is a commit message body that contains
+information about this commit`;
+
+  describe("when the commit message only contains a subject", () => {
+    it("returns the commit message subject", () => {
+      const subject = getCommitSubject(commitWithSubjectOnly);
+      expect(subject).toEqual(commitWithSubjectOnly);
+    });
+  });
+
+  describe("when the commit message contains a body", () => {
+    it("returns the commit message subject only, omitting the body", () => {
+      const subject = getCommitSubject(commitWithBody);
+      expect(subject).toEqual(commitWithSubjectOnly);
     });
   });
 });
