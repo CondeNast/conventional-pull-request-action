@@ -35962,30 +35962,6 @@ try {
 
 /***/ }),
 
-/***/ 8094:
-/***/ ((module) => {
-
-module.exports = () => {
-  let COMMIT_TITLE_MATCH = true;
-  try {
-    const ctmVal = JSON.parse(process.env.INPUT_COMMITTITLEMATCH.trim());
-    COMMIT_TITLE_MATCH =
-      ctmVal === true || ctmVal === false ? ctmVal : COMMIT_TITLE_MATCH;
-  } catch (_) {
-    // ignore json parse error
-  }
-
-  return {
-    COMMIT_TITLE_MATCH,
-    RULES_PATH: process.env.INPUT_COMMITLINTRULESPATH,
-    GITHUB_TOKEN: process.env.GITHUB_TOKEN,
-    GITHUB_WORKSPACE: process.env.GITHUB_WORKSPACE,
-  };
-};
-
-
-/***/ }),
-
 /***/ 3150:
 /***/ ((module) => {
 
@@ -36022,7 +35998,7 @@ const core = __nccwpck_require__(2186);
 const github = __nccwpck_require__(5438);
 const lint = __nccwpck_require__(9152).default;
 
-const getActionConfig = __nccwpck_require__(8094);
+const { getActionConfig, getCommitSubject } = __nccwpck_require__(1608);
 const actionMessage = __nccwpck_require__(3150);
 const getLintRules = __nccwpck_require__(2608);
 
@@ -36064,6 +36040,8 @@ async function lintPR() {
       per_page: 1,
     });
 
+    const commitMessageSubject = getCommitSubject(commit.message);
+
     const commitReport = await lint(commit.message, lintRules);
 
     commitReport.warnings.forEach((warn) =>
@@ -36077,7 +36055,7 @@ async function lintPR() {
       core.setFailed(actionMessage.fail.commit.lint);
     }
 
-    if (COMMIT_TITLE_MATCH && pullRequest.title !== commit.message) {
+    if (COMMIT_TITLE_MATCH && pullRequest.title !== commitMessageSubject) {
       core.setFailed(actionMessage.fail.commit.commit_title_match);
     }
   } else {
@@ -36134,6 +36112,37 @@ module.exports = async function getLintRules(actionConfig) {
   }
 
   return rules;
+};
+
+
+/***/ }),
+
+/***/ 1608:
+/***/ ((module) => {
+
+const getActionConfig = () => {
+  let COMMIT_TITLE_MATCH = true;
+  try {
+    const ctmVal = JSON.parse(process.env.INPUT_COMMITTITLEMATCH.trim());
+    COMMIT_TITLE_MATCH =
+      ctmVal === true || ctmVal === false ? ctmVal : COMMIT_TITLE_MATCH;
+  } catch (_) {
+    // ignore json parse error
+  }
+
+  return {
+    COMMIT_TITLE_MATCH,
+    RULES_PATH: process.env.INPUT_COMMITLINTRULESPATH,
+    GITHUB_TOKEN: process.env.GITHUB_TOKEN,
+    GITHUB_WORKSPACE: process.env.GITHUB_WORKSPACE,
+  };
+};
+
+const getCommitSubject = (commitMessage = "") => commitMessage.split("\n")[0];
+
+module.exports = {
+  getActionConfig,
+  getCommitSubject,
 };
 
 

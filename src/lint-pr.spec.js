@@ -2,16 +2,24 @@ const core = require("@actions/core");
 const github = require("@actions/github");
 
 const { lintPR } = require("./lint-pr.js");
-const getActionConfig = require("./action-config.js");
+const { getActionConfig } = require("./utils.js");
 const actionMessage = require("./action-message.js");
 const actionConfigFixture = require("./fixtures/action-config.js");
 
 jest.mock("@actions/github");
 jest.mock("@actions/core");
-jest.mock("./action-config.js");
+jest.mock("./utils.js", () => ({
+  ...jest.requireActual("./utils.js"),
+  getActionConfig: jest.fn(),
+}));
+
+getActionConfig.mockReturnValue(actionConfigFixture);
 
 const commitFixture = {
-  message: "feat: some commit message",
+  message: `feat: some commit message
+
+this is a commit message body that contains
+information about this commit`,
 };
 
 // pull request data from the github context payload
@@ -26,7 +34,7 @@ const contextPrFixture = {
 // fetched pull request
 const prFixture = {
   commits: 1,
-  title: commitFixture.message,
+  title: "feat: some commit message",
 };
 
 github.context = {
@@ -34,8 +42,6 @@ github.context = {
     pull_request: contextPrFixture,
   },
 };
-
-getActionConfig.mockImplementation(() => actionConfigFixture);
 
 const githubClient = {
   pulls: {
@@ -55,7 +61,7 @@ describe("lintPR", () => {
 
   describe("when pull request has one commit", () => {
     describe("when COMMIT_TITLE_MATCH is true", () => {
-      it("fails when pr title does not match the commit message", async () => {
+      it("fails when pr title does not match the commit subject", async () => {
         githubClient.pulls.get.mockReturnValueOnce({
           data: { ...prFixture, title: "feat: does not match commit" },
         });
@@ -68,11 +74,12 @@ describe("lintPR", () => {
     });
 
     describe("when COMMIT_TITLE_MATCH is false", () => {
-      it("passes when pr title does not match the commit message", async () => {
+      it("passes when pr title does not match the commit subject", async () => {
         getActionConfig.mockReturnValueOnce({
           ...actionConfigFixture,
           COMMIT_TITLE_MATCH: false,
         });
+
         githubClient.pulls.get.mockReturnValueOnce({
           data: { ...prFixture, title: "feat: does not match commit" },
         });
@@ -82,7 +89,7 @@ describe("lintPR", () => {
       });
     });
 
-    it("does not fail when commit message is to spec and pr title matches commit message", async () => {
+    it("does not fail when commit message is to spec and pr title matches commit subject", async () => {
       await lintPR();
       expect(core.setFailed).not.toHaveBeenCalled();
     });
