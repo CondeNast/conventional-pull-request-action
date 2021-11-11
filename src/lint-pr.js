@@ -32,6 +32,7 @@ async function lintPR() {
     repo,
     pull_number,
   });
+  core.info(`Found PR title: ${pullRequest.title}`);
 
   const lintRules = await getLintRules(actionConfig);
   const {
