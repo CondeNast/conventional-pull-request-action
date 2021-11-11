@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.2](https://github.com/CondeNast/conventional-pull-request/compare/v0.1.1...v0.1.2) (2021-11-11)
+
+
+### Features
+
+* echo the found PR title ([#16](https://github.com/CondeNast/conventional-pull-request/issues/16)) ([9fe307d](https://github.com/CondeNast/conventional-pull-request/commit/9fe307d4fdb5c23c67a3563d3da40923ea0dd406))
+
 ### [0.1.1](https://github.com/CondeNast/conventional-pull-request/compare/v0.1.0...v0.1.1) (2021-07-25)
 
 
