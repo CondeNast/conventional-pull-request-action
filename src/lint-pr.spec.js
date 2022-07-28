@@ -78,6 +78,22 @@ describe("lintPR", () => {
   });
 
   describe("when pull request has one commit", () => {
+    describe("when IGNORE_COMMITS is true", () => {
+      it("passes if commit message is not conventional", async () => {
+        getActionConfig.mockReturnValueOnce({
+          ...actionConfigFixture,
+          IGNORE_COMMITS: true,
+        });
+
+        githubClient.pulls.listCommits.mockReturnValueOnce({
+          data: [{ commit: { ...commitFixture, message: "not conventional" } }],
+        });
+
+        await lintPR();
+        expect(core.setFailed).not.toHaveBeenCalled();
+      });
+    });
+
     describe("when COMMIT_TITLE_MATCH is true", () => {
       it("fails when pr title does not match the commit subject", async () => {
         githubClient.pulls.get.mockReturnValueOnce({
@@ -106,6 +122,7 @@ describe("lintPR", () => {
         expect(core.setFailed).not.toHaveBeenCalled();
       });
     });
+
 
     it("does not fail when commit message is to spec and pr title matches commit subject", async () => {
       await lintPR();

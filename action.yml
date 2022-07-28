@@ -15,3 +15,7 @@ inputs:
     description: "PRs with a single commit require the PR title and commit message to match"
     required: false
     default: "true"
+  ignoreCommits:
+    description: "When using a squash merge strategy and your repo set to use PR titles for your commit message, this will ignore all commits"
+    required: false
+    default: "false"

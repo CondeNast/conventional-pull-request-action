@@ -46,3 +46,4 @@ jobs:
         with:
           commitlintRulesPath: "./commitlint.rules.js"
           commitTitleMatch: "true" # default: 'true'
+          ignoreCommits: "false" # default: 'false'

@@ -9,7 +9,7 @@ const getLintRules = require("./lint-rules.js");
 
 async function lintPR() {
   const actionConfig = getActionConfig();
-  const { GITHUB_TOKEN, COMMIT_TITLE_MATCH } = actionConfig;
+  const { GITHUB_TOKEN, COMMIT_TITLE_MATCH, IGNORE_COMMITS } = actionConfig;
 
   const client = github.getOctokit(GITHUB_TOKEN);
 
@@ -39,7 +39,8 @@ async function lintPR() {
     conventionalChangelog: { parserOpts },
   } = await parserPreset(null, null);
 
-  if (pullRequest.commits <= 1) {
+  if (!IGNORE_COMMITS && pullRequest.commits <= 1) {
+
     const {
       data: [{ commit }],
     } = await client.pulls.listCommits({

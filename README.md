@@ -57,6 +57,8 @@ jobs:
           commitlintRulesPath: "./commitlint.rules.js" # default: undefined
           # if the PR contains a single commit, fail if the commit message and the PR title do not match
           commitTitleMatch: "true" # default: 'true'
+          # if you squash merge PRs and have your github repo set to always use the PR title as the merge commit, you can disable all linting of commits
+          ignoreCommits: "false" # default: 'false'
 ```
 
 ### Rule Overrides
@@ -128,6 +130,8 @@ In the case of pull requests with a single commit, when a developer merges the P
 In the case of pull requests with a single commit, the commit message will be used as the merge commit message. In PRs with multiple commits, the PR title is used as the merge commit message. By enforcing a commit message/PR title match, we ensure a merge commit message will always match a PR title, no matter how many commits are included in a pull request.
 
 > To disable this behavior set `commitTitleMatch: 'false'`, see [configuration](#configuration)
+
+> To disable all linting of commits and only lint your PR title, set `ignoreCommits: 'true'`, see [configuration](#configuration)
 
 ## Contributors
 
