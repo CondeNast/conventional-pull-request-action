@@ -57,7 +57,7 @@ jobs:
           commitlintRulesPath: "./commitlint.rules.js" # default: undefined
           # if the PR contains a single commit, fail if the commit message and the PR title do not match
           commitTitleMatch: "true" # default: 'true'
-          # if you squash merge PRs and have your github repo set to always use the PR title as the merge commit, you can disable all linting of commits
+          # if you squash merge PRs and enabled "Default to PR title for squash merge commits", you can disable all linting of commits
           ignoreCommits: "false" # default: 'false'
 ```
 
