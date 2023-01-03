@@ -36395,7 +36395,7 @@ const getLintRules = __nccwpck_require__(2608);
 
 async function lintPR() {
   const actionConfig = getActionConfig();
-  const { GITHUB_TOKEN, COMMIT_TITLE_MATCH } = actionConfig;
+  const { GITHUB_TOKEN, COMMIT_TITLE_MATCH, IGNORE_COMMITS } = actionConfig;
 
   const client = github.getOctokit(GITHUB_TOKEN);
 
@@ -36425,7 +36425,8 @@ async function lintPR() {
     conventionalChangelog: { parserOpts },
   } = await parserPreset(null, null);
 
-  if (pullRequest.commits <= 1) {
+  if (!IGNORE_COMMITS && pullRequest.commits <= 1) {
+
     const {
       data: [{ commit }],
     } = await client.pulls.listCommits({
@@ -36518,16 +36519,21 @@ module.exports = async function getLintRules(actionConfig) {
 
 const getActionConfig = () => {
   let COMMIT_TITLE_MATCH = true;
+  let IGNORE_COMMITS = false;
   try {
     const ctmVal = JSON.parse(process.env.INPUT_COMMITTITLEMATCH.trim());
+    const ignoreCommitsVal = JSON.parse(process.env.INPUT_IGNORECOMMITS.trim());
     COMMIT_TITLE_MATCH =
       ctmVal === true || ctmVal === false ? ctmVal : COMMIT_TITLE_MATCH;
+    IGNORE_COMMITS =
+      ignoreCommitsVal === true || ignoreCommitsVal === false ? ignoreCommitsVal : IGNORE_COMMITS;
   } catch (_) {
     // ignore json parse error
   }
 
   return {
     COMMIT_TITLE_MATCH,
+    IGNORE_COMMITS,
     RULES_PATH: process.env.INPUT_COMMITLINTRULESPATH,
     GITHUB_TOKEN: process.env.GITHUB_TOKEN,
     GITHUB_WORKSPACE: process.env.GITHUB_WORKSPACE,
