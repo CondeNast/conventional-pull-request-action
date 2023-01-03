@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.2.0](https://github.com/CondeNast/conventional-pull-request-action/compare/v0.1.2...v0.2.0) (2023-01-03)
+
+
+### Features
+
+* Add ignoreCommits config value to skip single commit linting when unnecessary ([#18](https://github.com/CondeNast/conventional-pull-request-action/issues/18)) ([32b4070](https://github.com/CondeNast/conventional-pull-request-action/commit/32b40700c0bfac3461112cda5ac97c61148a57c8))
+
+
+### Bug Fixes
+
+* lint commit subject only, disregard body ([#20](https://github.com/CondeNast/conventional-pull-request-action/issues/20)) ([0803514](https://github.com/CondeNast/conventional-pull-request-action/commit/0803514b8fc100e9174110f9455779fdb36a5b64))
+
 ### [0.1.2](https://github.com/CondeNast/conventional-pull-request/compare/v0.1.1...v0.1.2) (2021-11-11)
 
 
