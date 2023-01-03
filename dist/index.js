@@ -36438,7 +36438,7 @@ async function lintPR() {
 
     const commitMessageSubject = getCommitSubject(commit.message);
 
-    const commitReport = await lint(commit.message, lintRules, { parserOpts });
+    const commitReport = await lint(commitMessageSubject, lintRules, { parserOpts });
 
     commitReport.warnings.forEach((warn) =>
       core.warning(`Commit message: ${warn.message}`)
