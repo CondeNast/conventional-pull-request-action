@@ -112,12 +112,9 @@ git commit
 
 ### Release
 
-From the up-to-date `main` branch:
+We use [Release Please](https://github.com/google-github-actions/release-please-action) to automate releases.
 
-```sh
-npm run release
-git push --follow-tags
-```
+Once feature/bugfix/etc PRs are merged, a Release Pull Request should be automatically created, approve the PR and merge.
 
 ## FAQ
 
