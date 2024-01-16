@@ -2,7 +2,7 @@
 
 [![license](https://img.shields.io/badge/license-Apache%202.0-blue.svg?style=flat)](LICENSE)
 
-A github action that enforces the [conventional commit spec][0] on pull requests to ensure a clean and conventional commit history.
+A Github action that enforces the [conventional commit spec][0] on pull requests to ensure a clean and conventional commit history.
 
 _Proudly built by:_
 
@@ -46,15 +46,15 @@ jobs:
   lint-pr:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       # check for the most recent release: https://github.com/CondeNast/conventional-pull-request-action/releases
       # replace vX.X.X below with the most recently released version
       - uses: CondeNast/conventional-pull-request-action@vX.X.X
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          # to override config-conventional rules, specify a relative path to your rules module, actions/checkout is required for this setting!
           commitlintRulesPath: "./commitlint.rules.js" # default: undefined
+          # to override config-conventional rules, specify a relative path to your rules module, actions/checkout is required for this setting!
           # if the PR contains a single commit, fail if the commit message and the PR title do not match
           commitTitleMatch: "true" # default: 'true'
           # if you squash merge PRs and enabled "Default to PR title for squash merge commits", you can disable all linting of commits
